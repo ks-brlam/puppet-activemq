@@ -284,6 +284,7 @@ class activemq (
   $log_file             = params_lookup( 'log_file' ),
   $port                 = params_lookup( 'port' ),
   $protocol             = params_lookup( 'protocol' )
+  $service_unmanaged    = params_lookup( 'service_unmanaged' )
   ) inherits activemq::params {
 
   $bool_create_user = any2bool($create_user)
@@ -298,6 +299,7 @@ class activemq (
   $bool_firewall=any2bool($firewall)
   $bool_debug=any2bool($debug)
   $bool_audit_only=any2bool($audit_only)
+  $bool_service_unmanaged=any2bool($service_unmanaged)
 
   ### Definition of some variables used in the module
   $manage_package = $bool_absent ? {
@@ -320,7 +322,10 @@ class activemq (
     true    => 'stopped',
     default =>  $bool_absent ? {
       true    => 'stopped',
-      default => 'running',
+      default => $bool_service_unmanaged ? {
+        true    => undef,
+        default => 'running',
+      }
     },
   }
 
